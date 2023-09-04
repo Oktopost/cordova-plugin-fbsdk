@@ -59,9 +59,6 @@
 }
 
 - (void) applicationDidBecomeActive:(NSNotification *) notification {
-    if (FBSDKSettings.sharedSettings.isAutoLogAppEventsEnabled) {
-        [FBSDKAppEvents.shared activateApp];
-    }
     if (self.applicationWasActivated == NO) {
         self.applicationWasActivated = YES;
         [self enableHybridAppEvents];
@@ -78,7 +75,7 @@
 #pragma mark - Cordova commands
 
 - (void)getApplicationId:(CDVInvokedUrlCommand *)command {
-    NSString *appID = FBSDKSettings.sharedSettings.appID;
+    NSString *appID = FBSDKSettings.appID;
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:appID];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -91,12 +88,12 @@
     }
     
     NSString *appId = [command argumentAtIndex:0];
-    [FBSDKSettings.sharedSettings setAppID:appId];
+    [FBSDKSettings setAppID:appId];
     [self returnGenericSuccess:command.callbackId];
 }
 
 - (void)getClientToken:(CDVInvokedUrlCommand *)command {
-    NSString *clientToken = FBSDKSettings.sharedSettings.clientToken;
+    NSString *clientToken = FBSDKSettings.clientToken;
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:clientToken];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -109,12 +106,12 @@
     }
     
     NSString *clientToken = [command argumentAtIndex:0];
-    [FBSDKSettings.sharedSettings setClientToken:clientToken];
+    [FBSDKSettings setClientToken:clientToken];
     [self returnGenericSuccess:command.callbackId];
 }
 
 - (void)getApplicationName:(CDVInvokedUrlCommand *)command {
-    NSString *displayName = FBSDKSettings.sharedSettings.displayName;
+    NSString *displayName = FBSDKSettings.displayName;
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:displayName];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
@@ -127,7 +124,7 @@
     }
     
     NSString *displayName = [command argumentAtIndex:0];
-    [FBSDKSettings.sharedSettings setDisplayName:displayName];
+    [FBSDKSettings setDisplayName:displayName];
     [self returnGenericSuccess:command.callbackId];
 }
 
@@ -172,19 +169,19 @@
 
 - (void)setAutoLogAppEventsEnabled:(CDVInvokedUrlCommand *)command {
     BOOL enabled = [[command argumentAtIndex:0] boolValue];
-    [FBSDKSettings.sharedSettings setAutoLogAppEventsEnabled:enabled];
+    [FBSDKSettings setAutoLogAppEventsEnabled:enabled];
     [self returnGenericSuccess:command.callbackId];
 }
 
 - (void)setAdvertiserIDCollectionEnabled:(CDVInvokedUrlCommand *)command {
     BOOL enabled = [[command argumentAtIndex:0] boolValue];
-    [FBSDKSettings.sharedSettings setAdvertiserIDCollectionEnabled:enabled];
+    [FBSDKSettings setAdvertiserIDCollectionEnabled:enabled];
     [self returnGenericSuccess:command.callbackId];
 }
 
 - (void)setAdvertiserTrackingEnabled:(CDVInvokedUrlCommand *)command {
     BOOL enabled = [[command argumentAtIndex:0] boolValue];
-    [FBSDKSettings.sharedSettings setAdvertiserTrackingEnabled:enabled];
+    [FBSDKSettings setAdvertiserTrackingEnabled:enabled];
     [self returnGenericSuccess:command.callbackId];
 }
 
@@ -197,11 +194,11 @@
 
     NSArray *options = [command argumentAtIndex:0];
     if ([command.arguments count] == 1) {
-        [FBSDKSettings.sharedSettings setDataProcessingOptions:options];
+        [FBSDKSettings setDataProcessingOptions:options];
     } else {
         NSString *country = [command.arguments objectAtIndex:1];
         NSString *state = [command.arguments objectAtIndex:2];
-        [FBSDKSettings.sharedSettings setDataProcessingOptions:options country:country state:state];
+        [FBSDKSettings setDataProcessingOptions:options country:country state:state];
     }
     [self returnGenericSuccess:command.callbackId];
 }
@@ -221,7 +218,7 @@
             [self.commandDelegate sendPluginResult:res callbackId:command.callbackId];
             return;
         } else {
-            [FBSDKAppEvents.shared setUserEmail:(NSString *)params[@"em"]
+            [FBSDKAppEvents setUserEmail:(NSString *)params[@"em"]
                             firstName:(NSString*)params[@"fn"] 
                             lastName:(NSString *)params[@"ln"] 
                             phone:(NSString *)params[@"ph"] 
@@ -238,7 +235,7 @@
 }
 
 - (void)clearUserData:(CDVInvokedUrlCommand *)command {
-    [FBSDKAppEvents.shared clearUserData];
+    [FBSDKAppEvents clearUserData];
     [self returnGenericSuccess:command.callbackId];
 }
 
@@ -257,20 +254,20 @@
         double value;
 
         if ([command.arguments count] == 1) {
-            [FBSDKAppEvents.shared logEvent:eventName];
+            [FBSDKAppEvents logEvent:eventName];
 
         } else {
             // argument count is not 0 or 1, must be 2 or more
             params = [command.arguments objectAtIndex:1];
             if ([command.arguments count] == 2) {
                 // If count is 2 we will just send params
-                [FBSDKAppEvents.shared logEvent:eventName parameters:params];
+                [FBSDKAppEvents logEvent:eventName parameters:params];
             }
 
             if ([command.arguments count] >= 3) {
                 // If count is 3 we will send params and a value to sum
                 value = [[command.arguments objectAtIndex:2] doubleValue];
-                [FBSDKAppEvents.shared logEvent:eventName valueToSum:value parameters:params];
+                [FBSDKAppEvents logEvent:eventName valueToSum:value parameters:params];
             }
         }
         [self returnGenericSuccess:command.callbackId];
@@ -288,10 +285,10 @@
         NSString *currency = [command.arguments objectAtIndex:1];
         
         if ([command.arguments count] == 2 ) {
-            [FBSDKAppEvents.shared logPurchase:value currency:currency];
+            [FBSDKAppEvents logPurchase:value currency:currency];
         } else if ([command.arguments count] >= 3) {
             NSDictionary *params = [command.arguments objectAtIndex:2];
-            [FBSDKAppEvents.shared logPurchase:value currency:currency parameters:params];
+            [FBSDKAppEvents logPurchase:value currency:currency parameters:params];
         }
 
         [self returnGenericSuccess:command.callbackId];
@@ -542,7 +539,7 @@
         			NSLog(@"photo_image cannot be decoded");
         		} else {
         			photo.image = [UIImage imageWithData:photoImageData];
-        			photo.isUserGenerated = YES;
+//        			photo.isUserGenerated = YES;
         		}
         	}
         	FBSDKSharePhotoContent *content = [[FBSDKSharePhotoContent alloc] init];
@@ -551,7 +548,8 @@
         } else {
         	FBSDKShareLinkContent *content = [[FBSDKShareLinkContent alloc] init];
         	content.contentURL = [NSURL URLWithString:params[@"href"]];
-            content.hashtag = [[FBSDKHashtag alloc] initWithString:[params objectForKey:@"hashtag"]];
+//            content.hashtag = [[FBSDKHashtag alloc] initWithString:[params objectForKey:@"hashtag"]];
+            content.hashtag = [[FBSDKHashtag alloc] initWithCoder:[params objectForKey:@"hashtag"]];
         	content.quote = params[@"quote"];
         	dialog.shareContent = content;
         }
@@ -776,7 +774,7 @@
 
 - (void) activateApp:(CDVInvokedUrlCommand *)command
 {
-    [FBSDKAppEvents.shared activateApp];
+    [FBSDKAppEvents activateApp];
     [self returnGenericSuccess:command.callbackId];
 }
 
@@ -921,12 +919,7 @@
 - (void)enableHybridAppEvents {
     if ([self.webView isMemberOfClass:[WKWebView class]]){
         NSString *is_enabled = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"FacebookHybridAppEvents"];
-        if([is_enabled isEqualToString:@"true"]){
-            [FBSDKAppEvents.shared augmentHybridWebView:(WKWebView*)self.webView];
-            NSLog(@"FB Hybrid app events are enabled");
-        } else {
-            NSLog(@"FB Hybrid app events are not enabled");
-        }
+        
     } else {
         NSLog(@"FB Hybrid app events cannot be enabled, this feature requires WKWebView");
     }
